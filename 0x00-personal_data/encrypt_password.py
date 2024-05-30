@@ -2,8 +2,8 @@
 """
 Module for hashing passwords using bcrypt.
 """
-
 import bcrypt
+
 
 def hash_password(password: str) -> bytes:
     """
@@ -20,4 +20,3 @@ def hash_password(password: str) -> bytes:
     # Hash the password with the generated salt
     hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
     return hashed
-
