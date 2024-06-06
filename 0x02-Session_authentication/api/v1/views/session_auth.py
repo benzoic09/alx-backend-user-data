@@ -5,13 +5,14 @@ from flask import jsonify, request, abort
 from api.v1.views import app_views
 from models.user import User
 from os import getenv
+from api.v1.app import auth
 
 
 @app_views.route('/auth_session/login', methods=['POST'], strict_slashes=False)
 def login():
     """ POST /api/v1/auth_session/login
     """
-    from api.v1.app import auth  # Import here to avoid circular import issues
+    # from api.v1.app import auth
 
     email = request.form.get('email')
     password = request.form.get('password')
@@ -37,3 +38,16 @@ def login():
     response.set_cookie(getenv("SESSION_NAME"), session_id)
 
     return response
+
+
+@app_views.route(
+        '/auth_session/logout', methods=['DELETE'], strict_slashes=False)
+def logout():
+    """ DELETE /api/v1/auth_session/logout
+    """
+    # from api.v1.app import auth
+
+    if not auth.destroy_session(request):
+        abort(404)
+
+    return jsonify({}), 200
