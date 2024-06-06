@@ -18,8 +18,7 @@ app.register_blueprint(app_views)
 CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
 
 
-# Import Auth and initialize auth variable
-# from api.v1.auth.auth import Auth
+# Determine which auth type to use based on the environment variable
 auth = None
 AUTH_TYPE = getenv("AUTH_TYPE", None)
 
@@ -55,10 +54,13 @@ def before_request():
     """before request handler"""
     if auth is None:
         return
+
     excluded_paths = [
-            '/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/']
+            '/api/v1/status/', '/api/v1/unauthorized/', '/api/v1/forbidden/',
+            '/api/v1/auth_session/login/']
     if not auth.require_auth(request.path, excluded_paths):
         return
+
     if auth.authorization_header(request) is None:
         abort(401)
 
