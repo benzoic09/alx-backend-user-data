@@ -63,6 +63,69 @@ def get_user(user_id: str) -> str:
     return jsonify(user.to_json())
 
 
+@app_views.route('/users', methods=['POST'], strict_slashes=False)
+def post_user() -> str:
+    """ POST /api/v1/users/
+    JSON body:
+      - email
+      - password
+      - last_name (optional)
+      - first_name (optional)
+    Return:
+      - User object JSON represented
+      - 400 if can't create the new User
+    """
+    rj = None
+    try:
+        rj = request.get_json()
+    except Exception:
+        rj = None
+    if rj is None:
+        return jsonify({"error": "Not a JSON"}), 400
+    if 'email' not in rj:
+        return jsonify({"error": "Missing email"}), 400
+    if 'password' not in rj:
+        return jsonify({"error": "Missing password"}), 400
+    user = User()
+    user.email = rj['email']
+    user.password = rj['password']
+    if 'last_name' in rj:
+        user.last_name = rj['last_name']
+    if 'first_name' in rj:
+        user.first_name = rj['first_name']
+    user.save()
+    return jsonify(user.to_json()), 201
+
+
+@app_views.route('/users/<user_id>', methods=['PUT'], strict_slashes=False)
+def put_user(user_id: str) -> str:
+    """ PUT /api/v1/users/<user_id>
+    JSON body:
+      - last_name (optional)
+      - first_name (optional)
+    Return:
+      - User object JSON represented
+      - 404 if the User ID doesn't exist
+      - 400 if can't update the User
+    """
+    user = User.get(user_id)
+    if user is None:
+        abort(404)
+    rj = None
+    try:
+        rj = request.get_json()
+    except Exception:
+        rj = None
+    if rj is None:
+        return jsonify({"error": "Not a JSON"}), 400
+    if 'last_name' in rj:
+        user.last_name = rj['last_name']
+    if 'first_name' in rj:
+        user.first_name = rj['first_name']
+    user.save()
+    return jsonify(user.to_json()), 200
+
+
 @app_views.route('/users/<user_id>', methods=['DELETE'], strict_slashes=False)
 def delete_user(user_id: str = None) -> str:
     """ DELETE /api/v1/users/:id
