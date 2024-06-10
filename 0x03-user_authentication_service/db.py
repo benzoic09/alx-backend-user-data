@@ -7,6 +7,7 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import InvalidRequestError
 from user import Base, User
+import bcrypt
 
 
 class DB:
@@ -36,7 +37,7 @@ class DB:
         self._session.add(new_user)
         self._session.commit()
         return new_user
-    
+
     def find_user_by(self, **kwargs) -> User:
         """Find a user by arbitrary keyword arguments."""
         try:
@@ -45,3 +46,18 @@ class DB:
             raise NoResultFound("No user found with the specified criteria.")
         except InvalidRequestError:
             raise InvalidRequestError("Invalid query arguments.")
+
+    def update_user(self, user_id: int, **kwargs) -> None:
+        """Update a user's attributes."""
+        user = self.find_user_by(id=user_id)
+        for key, value in kwargs.items():
+            if not hasattr(user, key):
+                raise ValueError("user has no attribute {}".format(key))
+            setattr(user, key, value)
+        self._session.commit()
+
+    def _hash_password(self, password: str) -> bytes:
+        """Hash a password string using bcrypt"""
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
+        return hashed
