@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+"""class user"""
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -6,7 +8,7 @@ Base = declarative_base()
 
 class User(Base):
     """create class user"""
-    __tablename__ = 'user'
+    __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
     email = Column(String(250), nullable=False)
