@@ -7,7 +7,6 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import InvalidRequestError
 from user import Base, User
-import bcrypt
 
 
 class DB:
@@ -55,9 +54,3 @@ class DB:
                 raise ValueError("user has no attribute {}".format(key))
             setattr(user, key, value)
         self._session.commit()
-
-    def _hash_password(self, password: str) -> bytes:
-        """Hash a password string using bcrypt"""
-        salt = bcrypt.gensalt()
-        hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
-        return hashed
