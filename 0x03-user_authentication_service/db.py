@@ -33,8 +33,8 @@ class DB:
 
     def add_user(self, email: str, hashed_password: str) -> User:
         """
-        add a new user to the db
-        Returns: User: The created User object
+            add a new user to the db
+            Returns: User: The created User object
         """
         new_user = User(email=email, hashed_password=hashed_password)
         self._session.add(new_user)
