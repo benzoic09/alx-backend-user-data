@@ -12,7 +12,7 @@ def index():
     return jsonify({"message": "Bienvenue"})
 
 
-@app.route("/users", methods=["POST"])
+@app.route("/users", methods=["POST"], strict_slashes=False)
 def users():
     """Register a new user."""
     email = request.form.get("email")
@@ -23,7 +23,7 @@ def users():
 
     try:
         user = AUTH.register_user(email, password)
-        return jsonify({"email": user.email, "message": "user created"}), 201
+        return jsonify({"email": user.email, "message": "user created"}), 200
     except ValueError:
         return jsonify({"message": "email already registered"}), 400
 
@@ -62,6 +62,20 @@ def logout():
     response = make_response(redirect("/"))
     response.set_cookie("session_id", "", expires=0)
     return response
+
+
+@app.route("/profile", methods=['GET'], strict_slashes=False)
+def profile():
+    """Get the profile of the logged-in user."""
+    session_id = request.cookies.get("session_id")
+    if session_id is None:
+        abort(403)
+
+    user = AUTH.get_user_from_session_id(session_id)
+    if user is None:
+        abort(403)
+
+    return jsonify({"email": user.email}), 200
 
 
 if __name__ == "__main__":
