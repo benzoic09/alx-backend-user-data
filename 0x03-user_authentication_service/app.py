@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, abort, make_response
+from flask import Flask, request, jsonify, abort, make_response, redirect
 from auth import Auth
 
 app = Flask(__name__)
@@ -50,13 +50,16 @@ def login():
 def logout():
     """Log out a user by destroying their session."""
     session_id = request.cookies.get("session_id")
+    if session_id is None:
+        abort(403)
+
     user = AUTH.get_user_from_session_id(session_id)
 
     if user is None:
-        return jsonify({"message": "User not found"}), 404
+        abort(403)
 
     AUTH.destroy_session(user.id)
-    response = make_response(jsonify({"message": "logout successful"}))
+    response = make_response(redirect("/"))
     response.set_cookie("session_id", "", expires=0)  # Clear the session_id cookie
     return response
 
